@@ -18,7 +18,7 @@ public class Alert {
     private Long accountId;
 
     @Column(nullable = false)
-    private String ruleName; // STRUCTURING, VELOCITY, ...
+    private String ruleName; // STRUCTURING, PROFILE_DEVIATION, ...
 
     private BigDecimal riskScore;
 
@@ -26,10 +26,22 @@ public class Alert {
     private String reason;
 
     @Column(nullable = false)
-    private String status = "OPEN"; // OPEN, REVIEWED, CLOSED
+    private String status = "OPEN"; // OPEN, AUTO_CLEARED, CLOSED, ESCALATED
 
     @Column(insertable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // --- Investigator draft (written by the system) ---
+    private String investigationSummary;
+    private String recommendation; // CLEAR, ESCALATE, NEED_INFO
+    private String confidence;     // LOW, MEDIUM, HIGH
+    private LocalDateTime investigatedAt;
+
+    // --- Analyst's final call (written by a human) ---
+    private String decision;       // CLEAR, ESCALATE, NEED_INFO
+    private String decisionNote;
+    private String decidedBy;
+    private LocalDateTime decidedAt;
 
     public Long getId() { return id; }
     public Long getTransactionId() { return transactionId; }
@@ -45,4 +57,20 @@ public class Alert {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getInvestigationSummary() { return investigationSummary; }
+    public void setInvestigationSummary(String s) { this.investigationSummary = s; }
+    public String getRecommendation() { return recommendation; }
+    public void setRecommendation(String r) { this.recommendation = r; }
+    public String getConfidence() { return confidence; }
+    public void setConfidence(String c) { this.confidence = c; }
+    public LocalDateTime getInvestigatedAt() { return investigatedAt; }
+    public void setInvestigatedAt(LocalDateTime t) { this.investigatedAt = t; }
+    public String getDecision() { return decision; }
+    public void setDecision(String d) { this.decision = d; }
+    public String getDecisionNote() { return decisionNote; }
+    public void setDecisionNote(String n) { this.decisionNote = n; }
+    public String getDecidedBy() { return decidedBy; }
+    public void setDecidedBy(String d) { this.decidedBy = d; }
+    public LocalDateTime getDecidedAt() { return decidedAt; }
+    public void setDecidedAt(LocalDateTime t) { this.decidedAt = t; }
 }

@@ -16,6 +16,16 @@ It flags suspicious deposits with explainable rules and keeps an alert queue for
 - **Auto-clearing:** if a source of funds is on record (e.g. sale of a house), a profile-deviation alert is logged as `AUTO_CLEARED` instead of going to the analyst queue. It is kept for audit.
 - Rules share a `FraudRule` interface, so adding a new rule is one new class.
 
+## Investigator (analyst assist)
+
+Does the first pass of an analyst's research so they review a draft instead of starting from zero.
+
+- Gathers the customer's deposit history and profile, then checks a sanctions list and public records
+- Writes a draft case summary with a recommendation (CLEAR / ESCALATE / NEED_INFO), a confidence level, the reasoning, and the sources used
+- **It only recommends.** Only the analyst's decision can close or escalate an alert
+- Every investigation and decision is written to an audit trail, including whether the analyst agreed with the draft
+- The sanctions list and public records are **mock data** for the demo. A production system would use licensed sources, verify identity matches, and keep a person accountable for the decision
+
 ## API
 
 | Method | Endpoint | Purpose |
@@ -24,7 +34,11 @@ It flags suspicious deposits with explainable rules and keeps an alert queue for
 | PUT | `/accounts/{id}/profile` | Update expected deposits, risk rating, source of funds |
 | POST | `/transactions` | Record a transaction and run all rules |
 | GET | `/transactions?accountId=` | List an account's transactions |
-| GET | `/alerts?status=OPEN` | List alerts (OPEN, AUTO_CLEARED, ...) |
+| GET | `/alerts?status=OPEN` | List alerts (OPEN, AUTO_CLEARED, CLOSED, ESCALATED) |
+| GET | `/alerts/{id}` | One alert, including its draft summary and decision |
+| POST | `/alerts/{id}/investigate` | Investigator gathers evidence and writes a draft case summary |
+| PUT | `/alerts/{id}/decision` | Analyst makes the final call: CLEAR, ESCALATE or NEED_INFO |
+| GET | `/alerts/{id}/audit` | Audit trail of every investigation and decision |
 
 ## Run locally
 
@@ -41,7 +55,7 @@ It flags suspicious deposits with explainable rules and keeps an alert queue for
 ## Planned
 - Velocity rule (too many transactions in a short window)
 - ML risk score alongside the rules
-- AI investigator that drafts a case summary for the analyst, who makes the final decision
+- Use the Claude API to write the case-summary narrative (the recommendation logic is currently rule-based)
 - Deployment to AWS
 
 ## Limitations

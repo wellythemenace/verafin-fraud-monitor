@@ -30,3 +30,23 @@ CREATE TABLE IF NOT EXISTS alerts (
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS risk_rating VARCHAR(10) NOT NULL DEFAULT 'LOW';
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS expected_monthly_deposits NUMERIC(14,2);
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS source_of_funds_note TEXT;
+
+-- Investigator: draft case summary + analyst decision on each alert
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS investigation_summary TEXT;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS recommendation VARCHAR(20);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS confidence VARCHAR(10);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS investigated_at TIMESTAMP;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS decision VARCHAR(20);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS decision_note TEXT;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS decided_by VARCHAR(60);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS decided_at TIMESTAMP;
+
+-- Audit trail: every investigation and every decision is recorded
+CREATE TABLE IF NOT EXISTS alert_audit (
+    id         BIGSERIAL PRIMARY KEY,
+    alert_id   BIGINT NOT NULL REFERENCES alerts(id),
+    action     VARCHAR(30) NOT NULL,   -- INVESTIGATED, DECISION
+    actor      VARCHAR(60) NOT NULL,   -- "system" or the analyst's name
+    detail     TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
